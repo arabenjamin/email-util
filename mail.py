@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from exchangelib import DELEGATE, Account, Credentials, Message, Mailbox,Configuration,NTLM
+from emailValidate import checkUserEmail
 
 class mailer(object):
     
