@@ -109,7 +109,6 @@ def aliasTest(mxrecord,email):
 		#print code 
 		#print message
     except (socket.error,socket.timeout):
-	    raise NetworkError()
 	    return False 
 	# Assume SMTP response 250 is success
     if code == 250:
@@ -139,12 +138,11 @@ def checkUserEmail(email_address):
 
     try:
         finalTest = aliasTest(domainTest,email_address)
+        if finalTest == False:
+			raise EmailDeliveryError("The alias does not exist at this domain")
+			return False
     except NetworkError:
         raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
-        return False
-	
-    if finalTest == False:
-        raise EmailDeliveryError("The alias does not exist at this domain")
         return False
 			
     return True
