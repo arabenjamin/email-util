@@ -108,14 +108,15 @@ def aliasTest(mxrecord,email):
 		server.quit()
 		#print code 
 		#print message
+		if code == 250:
+			return True
+			# What else though? What if you get status code 550? 
+			#Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
     except (socket.error,socket.timeout,smtplib.SMTPServerDisconnected):
 	    return False 
 	# Assume SMTP response 250 is success
-    if code == 250:
-        return True
-        # What else though? What if you get status code 550? 
-        #Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
-	return False
+
+    return False
 	
  
 
