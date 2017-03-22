@@ -36,9 +36,11 @@ class NetworkError(Exception):
 
 def server(mxrecord,email):
     # SMTP Conversation
-    server = smtplib.SMTP(timeout=2)
+    server = smtplib.SMTP(timeout=10)
     server.set_debuglevel(0)
+    
     server.connect(mxrecord)# What happens if it doesn't connect?
+    server.starttls()
     server.helo(server.local_hostname)
     server.mail(fromAddress)
     code, message = server.rcpt(str(email))
