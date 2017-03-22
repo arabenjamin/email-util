@@ -99,7 +99,7 @@ def aliasTest(mxrecord,email):
     # Will this method work with A & AAAA records?
     try:
 		# SMTP Conversation
-		server = smtplib.SMTP(timeout=10)
+		server = smtplib.SMTP(timeout=3)
 		server.set_debuglevel(0)
 		server.connect(mxrecord)# What happens if it doesn't connect?
 		server.helo(server.local_hostname)
@@ -109,7 +109,7 @@ def aliasTest(mxrecord,email):
 		#print code 
 		#print message
     except (socket.error,socket.timeout):
-	    #raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
+	    raise NetworkError()
 	    return False 
 	# Assume SMTP response 250 is success
     if code == 250:
@@ -137,7 +137,12 @@ def checkUserEmail(email_address):
         raise DomianError("Either the domain does not exist, or there was no answer from the server")		
         return False
 
-    finalTest = aliasTest(domainTest,email_address)
+    try:
+        finalTest = aliasTest(domainTest,email_address)
+    except NetworkError:
+        raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
+        return False
+	
     if finalTest == False:
         raise EmailDeliveryError("The alias does not exist at this domain")
         return False
