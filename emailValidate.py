@@ -168,5 +168,6 @@ if __name__ == "__main__":
 		try:
 			assert checkUserEmail(email) == True
 			#now send them an email
+            print "\nEmail Address: {0} Passed".format(email)
 		except (AssertionError,ValueError,DomianError,EmailDeliveryError,InvalidEmailError,NetworkError) as e:
-			print "Email Address: {0} \nFalied with: {1}\n".format(email,str(e))
+			print "\nEmail Address: {0} \nFalied with: {1}\n".format(email,str(e))
