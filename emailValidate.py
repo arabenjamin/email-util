@@ -139,7 +139,7 @@ def checkUserEmail(email_address):
     try:
         finalTest = aliasTest(domainTest,email_address)
         if finalTest == False:
-			raise EmailDeliveryError("The alias does not exist at this domain")
+			raise EmailDeliveryError("Could not reach alias at this domian")
 			return False
     except NetworkError:
         raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
