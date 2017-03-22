@@ -1,5 +1,6 @@
 #!usr/bin/python
 import smtplib
+import socket
 import re
 
 try:
