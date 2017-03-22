@@ -120,8 +120,9 @@ def aliasTest(mxrecord,email):
         except Exception as e:
             print e		
 		
-    except (socket.error,socket.timeout):
-        raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
+    except (socket.error,socket.timeout) as e:
+	    print e
+        #raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
 	# Assume SMTP response 250 is success
     if code == 250:
 		return True
