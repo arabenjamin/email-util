@@ -165,9 +165,9 @@ if __name__ == "__main__":
               'DITotaan@evergreenhealthcare.org']
 
     for email in emails:
-		try:
-			assert checkUserEmail(email) == True
+        try:
+            assert checkUserEmail(email) == True
 			#now send them an email
             print "\nEmail Address: {0} Passed".format(email)
-		except (AssertionError,ValueError,DomianError,EmailDeliveryError,InvalidEmailError,NetworkError) as e:
+        except (AssertionError,ValueError,DomianError,EmailDeliveryError,InvalidEmailError,NetworkError) as e:
 			print "\nEmail Address: {0} \nFalied with: {1}\n".format(email,str(e))
