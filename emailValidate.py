@@ -36,17 +36,17 @@ class NetworkError(Exception):
 
 def server(mxrecord,email):
     # SMTP Conversation
-	server = smtplib.SMTP(timeout=2)
-	server.set_debuglevel(0)
-	server.connect(mxrecord)# What happens if it doesn't connect?
-	server.helo(server.local_hostname)
-	server.mail(fromAddress)
-	code, message = server.rcpt(str(email))
-	server.quit()
-	time.sleep(1)
+    server = smtplib.SMTP(timeout=2)
+    server.set_debuglevel(0)
+    server.connect(mxrecord)# What happens if it doesn't connect?
+    server.helo(server.local_hostname)
+    server.mail(fromAddress)
+    code, message = server.rcpt(str(email))
+    server.quit()
+    time.sleep(1)
 	#print code 
 	#print message
-	return code
+    return code
 	
 #check if the eamil is a valid email format
 def isEmailValid(email_address):
@@ -94,14 +94,14 @@ def recordsTest(email_address):
 	    # Todo: Test the below. Can you connect to the server with the A/AAAA Records? Do we get the right info there? Someone else did it this way, why can't we?
         try:
             records = resolver.query(domain, 'A')
-            ARecord = [(0, str(r)) for r in records]
+            ARecord = records[0]
             ARecord = str(ARecord)
             #print "A:{0} for email:{1} ".format(ARecord , email_address)
             return ARecord			
         except(resolver.NoNameservers,resolver.NoAnswer,resolver.NXDOMAIN) as error:
             try:
                 records = resolver.query(domain, 'AAAA')
-                AAAARecord = [(0, str(r)) for r in records]
+                AAAARecord = records[0]
                 AAAARecord = str(AAAARecord)
                 #print "AAAA :{0} for email:{1} ".format(ARecord , email_address)
                 return AAAARecord				
@@ -114,14 +114,10 @@ def aliasTest(mxrecord,email):
     try:
 		# SMTP Conversation
 		code = server(mxrecord,email)
-    except smtplib.SMTPServerDisconnected:
-        try:
-            code = server(mxrecord,email)		
-        except Exception as e:
-            print e		
-		
-    except (socket.error,socket.timeout) as e:
-	    print e
+    except (smtplib.SMTPServerDisconnected,socket.error,socket.timeout) as e:
+        print email,e	
+        return False
+
         #raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
 	# Assume SMTP response 250 is success
     if code == 250:
@@ -150,8 +146,7 @@ def checkUserEmail(email_address):
         return False
 
     try:
-        finalTest = aliasTest(domainTest,email_address)
-        
+        finalTest = aliasTest(domainTest,email_address)    
     except NetworkError:
         raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
         return False
