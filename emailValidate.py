@@ -25,6 +25,10 @@ class DomianError(Exception):
     #Todo: This is lame. pass in the errors and process them.
     pass
 
+class NetWorkError(Exception):
+    """something wouldn't connect"""
+    pass
+
 
 #Todo: Put this script into it's own class.	
 	
@@ -92,24 +96,27 @@ def recordsTest(email_address):
 # try and send an email to the address in question.
 def aliasTest(mxrecord,email):
     # Will this method work with A & AAAA records?
-
-	# SMTP Conversation
-    server = smtplib.SMTP(timeout=10)
-    server.set_debuglevel(0)
-    server.connect(mxrecord)# What happens if it doesn't connect?
-    server.helo(server.local_hostname)
-    server.mail(fromAddress)
-    code, message = server.rcpt(str(email))
-    server.quit()
-    #print code 
-    #print message
-
+    try:
+		# SMTP Conversation
+		server = smtplib.SMTP(timeout=10)
+		server.set_debuglevel(0)
+		server.connect(mxrecord)# What happens if it doesn't connect?
+		server.helo(server.local_hostname)
+		server.mail(fromAddress)
+		code, message = server.rcpt(str(email))
+		server.quit()
+		#print code 
+		#print message
+    except (socket.error,socket.timeout):
+	    raise NetworkError('Falied to connect to mail server, Either timeout or someother error')
+	    return False 
 	# Assume SMTP response 250 is success
     if code == 250:
         return True
         # What else though? What if you get status code 550? 
         #Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
 	return False
+	
  
 
  
