@@ -99,7 +99,7 @@ def aliasTest(mxrecord,email):
     # Will this method work with A & AAAA records?
     try:
 		# SMTP Conversation
-		server = smtplib.SMTP(timeout=3)
+		server = smtplib.SMTP(timeout=10)
 		server.set_debuglevel(0)
 		server.connect(mxrecord)# What happens if it doesn't connect?
 		server.helo(server.local_hostname)
