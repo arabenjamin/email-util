@@ -155,7 +155,7 @@ if __name__ == "__main__":
     # Lets se how we did...
     emails = ['ara.benjamin@gmail.com',
               'asheperdigian@eltec.cc',
-              'dispatch-teamn@eltec.cc',
+              'dispatch-team@eltec.cc',
               'asheperdigian@gmail.com',
               'asshat7@gmail.com',
               'dsfdsfsdfs',
