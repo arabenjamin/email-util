@@ -108,7 +108,7 @@ def aliasTest(mxrecord,email):
 		server.quit()
 		#print code 
 		#print message
-    except (socket.error,socket.timeout):
+    except (socket.error,socket.timeout,smtplib.SMTPServerDisconnected):
 	    return False 
 	# Assume SMTP response 250 is success
     if code == 250:
