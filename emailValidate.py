@@ -26,7 +26,7 @@ class DomianError(Exception):
     #Todo: This is lame. pass in the errors and process them.
     pass
 
-class NetWorkError(Exception):
+class NetworkError(Exception):
     """something wouldn't connect"""
     pass
 
