@@ -44,7 +44,8 @@ def server(mxrecord,email):
     server.helo(server.local_hostname)
     server.mail(fromAddress)
     code, message = server.rcpt(str(email))
-    server.quit()
+    sQuit = server.quit()
+    print sQuit
     time.sleep(1)
     print email 
     print code 
