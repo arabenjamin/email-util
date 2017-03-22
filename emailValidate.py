@@ -113,7 +113,7 @@ def aliasTest(mxrecord,email):
 			# What else though? What if you get status code 550? 
 			#Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
     except (socket.error,socket.timeout,smtplib.SMTPServerDisconnected):
-	    return False 
+	    raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
 	# Assume SMTP response 250 is success
 
     return False
