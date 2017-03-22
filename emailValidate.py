@@ -32,7 +32,21 @@ class NetworkError(Exception):
 
 
 #Todo: Put this script into it's own class.	
-	
+
+
+def server(mxrecord,email):
+    # SMTP Conversation
+	server = smtplib.SMTP(timeout=2)
+	server.set_debuglevel(0)
+	server.connect(mxrecord)# What happens if it doesn't connect?
+	server.helo(server.local_hostname)
+	server.mail(fromAddress)
+	code, message = server.rcpt(str(email))
+	server.quit()
+	time.sleep(1)
+	#print code 
+	#print message
+	return code
 	
 #check if the eamil is a valid email format
 def isEmailValid(email_address):
@@ -99,24 +113,20 @@ def aliasTest(mxrecord,email):
     # Will this method work with A & AAAA records?
     try:
 		# SMTP Conversation
-		server = smtplib.SMTP(timeout=2)
-		server.set_debuglevel(0)
-		server.connect(mxrecord)# What happens if it doesn't connect?
-		server.helo(server.local_hostname)
-		server.mail(fromAddress)
-		code, message = server.rcpt(str(email))
-		server.quit()
-		time.sleep(1)
-		#print code 
-		#print message
-		if code == 250:
-			return True
-			# What else though? What if you get status code 550? 
-			#Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
-    except (socket.error,socket.timeout,smtplib.SMTPServerDisconnected):
-	    raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
+		code = server(mxrecord,email)
+    except smtplib.SMTPServerDisconnected:
+        try:
+            code = server(mxrecord,email)		
+        except Exception as e:
+            print e		
+		
+    except (socket.error,socket.timeout):
+        raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
 	# Assume SMTP response 250 is success
-
+    if code == 250:
+		return True
+		# What else though? What if you get status code 550? 
+		#Todo: Decide what to do with emails that don't exist at that server. i.e. pull that email from the db?
     return False
 	
  
