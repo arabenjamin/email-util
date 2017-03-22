@@ -44,8 +44,9 @@ def server(mxrecord,email):
     code, message = server.rcpt(str(email))
     server.quit()
     time.sleep(1)
-	#print code 
-	#print message
+    print email 
+    print code 
+    print message
     return code
 	
 #check if the eamil is a valid email format
@@ -120,6 +121,7 @@ def aliasTest(mxrecord,email):
 
         #raise NetworkError('Falied to connect to mail server, Either timeout or someother error') 
 	# Assume SMTP response 250 is success
+    
     if code == 250:
 		return True
 		# What else though? What if you get status code 550? 
