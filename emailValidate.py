@@ -2,7 +2,7 @@
 import smtplib
 import socket
 import re
-
+import time
 try:
     #Note/Todo: this library doesn't install correcty everywhere, always
     from dns import resolver
@@ -106,6 +106,7 @@ def aliasTest(mxrecord,email):
 		server.mail(fromAddress)
 		code, message = server.rcpt(str(email))
 		server.quit()
+		time.sleep(1)
 		#print code 
 		#print message
 		if code == 250:
