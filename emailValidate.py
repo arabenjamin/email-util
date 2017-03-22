@@ -74,22 +74,22 @@ def recordsTest(email_address):
 		records = resolver.query(domain, 'MX')
 		mxRecord = records[0].exchange
 		mxRecord = str(mxRecord)
-		print "MX:{0} for email:{1} ".format(mxRecord , email_address)
+		#print "MX:{0} for email:{1} ".format(mxRecord , email_address)
 		return mxRecord		
     except (resolver.NoNameservers,resolver.NoAnswer,resolver.NXDOMAIN) as error:
 	    # Todo: Test the below. Can you connect to the server with the A/AAAA Records? Do we get the right info there? Someone else did it this way, why can't we?
         try:
-            records = resolver.query(domain, 'MX')
+            records = resolver.query(domain, 'A')
             ARecord = [(0, str(r)) for r in records]
             ARecord = str(ARecord)
-            print "A:{0} for email:{1} ".format(ARecord , email_address)
+            #print "A:{0} for email:{1} ".format(ARecord , email_address)
             return ARecord			
         except(resolver.NoNameservers,resolver.NoAnswer,resolver.NXDOMAIN) as error:
             try:
-                records = resolver.query(domain, 'MX')
+                records = resolver.query(domain, 'AAAA')
                 AAAARecord = [(0, str(r)) for r in records]
                 AAAARecord = str(AAAARecord)
-                print "AAAA :{0} for email:{1} ".format(ARecord , email_address)
+                #print "AAAA :{0} for email:{1} ".format(ARecord , email_address)
                 return AAAARecord				
             except(resolver.NoNameservers,resolver.NoAnswer,resolver.NXDOMAIN) as error:
                 return False
