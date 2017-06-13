@@ -1,6 +1,2 @@
 #!usr/bin/python
-
-import mail
-import emailValidate
-
-#TODO: Fill this out
+from mail import mailer
