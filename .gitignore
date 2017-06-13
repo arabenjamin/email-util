@@ -1,0 +1,30 @@
+# Compiled source #
+###################
+*.pyc
+
+# python testing things etc#
+#############################
+env
+.coverage
+.tox
+*.egg
+*.cache
+*.egg-info
+*.idea
+
+
+# Release generated files #
+###########################
+.eggs/
+build/
+dist/
+
+#Configs #
+##########################
+instance/
+*config.*
+
+# Excel files #
+#########################
+*.xls
+*.xlsx
