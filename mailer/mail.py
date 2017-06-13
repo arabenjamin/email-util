@@ -107,5 +107,6 @@ if __name__=='__main__':
     sub = "Ara's Test Email"
     recipient = "asheperdigian@eltec.cc"
     ccList = ["asheperdigian@eltec.cc"]
+    #: WAIT!!! You need conf settings first.... this will never work.
     my_mail = mailer(cfg,recipient,ccList,sub,mynotes)
     my_mail.sendmsg()
