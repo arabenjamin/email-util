@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from exchangelib import DELEGATE, Account, Credentials, Message, Mailbox,\
-    Configuration,NTLM,FileAttachment
+    Configuration, NTLM
+from exchangelib import FileAttachment
 import os
 
 class mailer(object):
@@ -10,11 +11,11 @@ class mailer(object):
     def __init__(self,cfg,recipient,cc,subject,mybody,attachment=None):
         """ @class parameters:
 
-            #: cfg: credentials to use the exchange account, suplied as a dict
-            #: recipient: email address as string
-            #: cc: a list of email address strings
-            #: ***mybody: the body of the email...
-            #: attachment: dict object containing the filename,
+            #: @cfg: credentials to use the exchange account, suplied as a dict
+            #: @recipient: email address as string
+            #: @cc: a list of email address strings
+            #: @mybody***: the body of the email...
+            #: @attachment: dict object containing the filename,
             #:             full absolute path of the file to be attached.
             #:             Defaults to None.
 
