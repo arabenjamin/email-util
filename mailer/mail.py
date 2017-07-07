@@ -3,7 +3,8 @@
 from exchangelib import DELEGATE, Account, Credentials, Message, Mailbox,\
     Configuration, NTLM
 from exchangelib import FileAttachment
-import os
+import os,re
+
 
 class mailer(object):
     """ Mailer Class to Send emails via MS Exchange"""
@@ -27,7 +28,7 @@ class mailer(object):
         self.body = mybody
         self.attachment = attachment
 
-        """ to avoid errors of the Account class, set the smtp_address to string"""
+        """ to avoid errors from the Account class, set the smtp_address to string"""
         self.smtp_address = self.config['smtp_address']
 
         """ setup exchange Credentials, Configuration and Account """
@@ -46,11 +47,11 @@ class mailer(object):
                 subject=self.subject,
                 body=self.body,
                 to_recipients=[Mailbox(email_address=self.recipient)],
-                cc_recipients =[Mailbox(email_address="dispatch-team@eltec.cc")]
+                cc_recipients =[]
             )
 
     #check if the eamil is a valid email format
-    def isEmailValid(email_address):
+    def isEmailValid(self,email_address):
         """ Regex is cheap, easy to find, hard to read and verify.But-fuckit.
             This regex is taken from:
             https://github.com/scottbrady91/Python-Email-Verification-Script/blob/master/src/VerifyEmailAddress.py """
@@ -85,11 +86,14 @@ class mailer(object):
 
         """ loop through cc list and add them to the msg"""
         for i in self.cc:
-            self.msg.cc_recipients.append(Mailbox(email_address=i))
-            print "message is being sent to: ",i
-            #: TODO: write to logger file who we sent emails to.
-            #: TODO: validate the cc_list to be actual emails before loading
-            #:      them into the Mailbox class
+
+            """ valifdate the email that we're sending to"""
+            if self.isEmailValid(i) is True:
+                self.msg.cc_recipients.append(Mailbox(email_address=i))
+                print "message is being sent to: {0} \nas: {1} ".format(i,self.smtp_address)
+                #: TODO: write to logger file who we sent emails to.
+                #: TODO: validate the cc_list to be actual emails before loading
+                #:      them into the Mailbox class
 
         """ send the msg and save a copy in exchange """
         return self.msg.send_and_save()
