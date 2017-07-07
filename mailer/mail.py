@@ -3,8 +3,11 @@
 from exchangelib import DELEGATE, Account, Credentials, Message, Mailbox,\
     Configuration, NTLM
 from exchangelib import FileAttachment
-import os,re
+import sys,os,re
 
+class InvalidEmailError(ValueError):
+	"""Parent class of all exceptions raised by this module."""
+	pass
 
 class mailer(object):
     """ Mailer Class to Send emails via MS Exchange"""
@@ -12,13 +15,13 @@ class mailer(object):
     def __init__(self,cfg,recipient,cc,subject,mybody,attachment=None):
         """ @class parameters:
 
-            #: @cfg: credentials to use the exchange account, suplied as a dict
-            #: @recipient: email address as string
-            #: @cc: a list of email address strings
-            #: @mybody***: the body of the email...
-            #: @attachment: dict object containing the filename,
-            #:             full absolute path of the file to be attached.
-            #:             Defaults to None.
+            #: @cfg: credentials for the exchange account, suplied as a dict
+            #: @recipient   : email address as string
+            #: @cc          : a list of email address strings
+            #: @mybody***   : the body of the email...
+            #: @attachment  : dict object containing the filename,
+            #:                full absolute path of the file to be attached.
+            #:                Defaults to None.
 
         """
         self.config = cfg
@@ -28,7 +31,7 @@ class mailer(object):
         self.body = mybody
         self.attachment = attachment
 
-        """ to avoid errors from the Account class, set the smtp_address to string"""
+        """ to avoid errors from the Account class, set the smtp_address to string """
         self.smtp_address = self.config['smtp_address']
 
         """ setup exchange Credentials, Configuration and Account """
@@ -38,6 +41,12 @@ class mailer(object):
          credentials = self.cred, auth_type=NTLM)
         self.account = Account(primary_smtp_address=self.smtp_address,\
          config=self.config, access_type=DELEGATE)
+
+        """ validate email address before initializeing the Message class"""
+        if self.isEmailValid(self.recipient) != True:
+            raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format ".format(self.recipient))
+            #sys.exit()
+
 
         """ initialize msg class with our credentials, Configuration and account """
         #: NOTE: every email recipient gets
@@ -90,28 +99,13 @@ class mailer(object):
             """ valifdate the email that we're sending to"""
             if self.isEmailValid(i) is True:
                 self.msg.cc_recipients.append(Mailbox(email_address=i))
-                print "message is being sent to: {0} \nas: {1} ".format(i,self.smtp_address)
+                print "message is being sent to: {0} as: {1} ".format(i,self.smtp_address)
                 #: TODO: write to logger file who we sent emails to.
                 #: TODO: validate the cc_list to be actual emails before loading
                 #:      them into the Mailbox class
+            else:
+                raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(i))
+                #: TODO: write to logger file who we did not send emails to.
 
         """ send the msg and save a copy in exchange """
         return self.msg.send_and_save()
-
-
-if __name__=='__main__':
-
-    mynotes ="""Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-    reprehenderit in voluptate velit esse cillum dolore eu fugiat
-    nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-    sunt in culpa qui officia deserunt mollit anim id est laborum."""
-
-    sub = "Ara's Test Email"
-    recipient = "asheperdigian@eltec.cc"
-    ccList = ["asheperdigian@eltec.cc"]
-    #: WAIT!!! You need conf settings first.... this will never work.
-    my_mail = mailer(cfg,recipient,ccList,sub,mynotes)
-    my_mail.sendmsg()
