@@ -102,7 +102,7 @@ class mailer(object):
             """ valifdate the email that we're sending to"""
             if self.isEmailValid(i) is True:
 
-                if i is not in self.msg.cc_recipients:
+                if i not in self.msg.cc_recipients:
 
                     self.msg.cc_recipients.append(Mailbox(email_address=i))
                     print "message is being sent to: {0} as: {1} ".format(i,self.smtp_address)
