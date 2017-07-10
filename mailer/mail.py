@@ -65,8 +65,11 @@ class mailer(object):
             This regex is taken from:
             https://github.com/scottbrady91/Python-Email-Verification-Script/blob/master/src/VerifyEmailAddress.py """
 
+
         # NOTE: Check out the regex over at
         #       https://github.com/syrusakbary/validate_email/blob/master/validate_email.py
+
+        email_address = email_address.lower().replace(" ","")
         if not re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email_address):
             return False
         return True
@@ -98,11 +101,12 @@ class mailer(object):
 
             """ valifdate the email that we're sending to"""
             if self.isEmailValid(i) is True:
-                self.msg.cc_recipients.append(Mailbox(email_address=i))
-                print "message is being sent to: {0} as: {1} ".format(i,self.smtp_address)
-                #: TODO: write to logger file who we sent emails to.
-                #: TODO: validate the cc_list to be actual emails before loading
-                #:      them into the Mailbox class
+
+                if i is not in self.msg.cc_recipients:
+
+                    self.msg.cc_recipients.append(Mailbox(email_address=i))
+                    print "message is being sent to: {0} as: {1} ".format(i,self.smtp_address)
+                    #: TODO: write to logger file who we sent emails to.
             else:
                 raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(i))
                 #: TODO: write to logger file who we did not send emails to.
