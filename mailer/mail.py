@@ -5,71 +5,62 @@ from exchangelib import DELEGATE, Account, Credentials, Message, Mailbox,\
 from exchangelib import FileAttachment
 import sys,os,re
 
+
+""" Class Errors """
 class InvalidEmailError(ValueError):
-	"""Parent class of all exceptions raised by this module."""
 	pass
+
+class InvalidConfigObject(ValueError):
+    pass
+
+class InvalidRecipient(ValueError):
+    pass
+
+class InvalidAttachment(ValueError):
+    pass
 
 class mailer(object):
     """ Mailer Class to Send emails via MS Exchange"""
 
-    def __init__(self,cfg,recipient,cc,subject,mybody,attachment=None):
-        """ @class parameters:
+    def __init__(self,cfg):
 
-            #: @cfg: credentials for the exchange account, suplied as a dict
-            #: @recipient   : email address as string
-            #: @cc          : a list of email address strings
-            #: @mybody***   : the body of the email...
-            #: @attachment  : dict object containing the filename,
-            #:                full absolute path of the file to be attached.
-            #:                Defaults to None.
-
-        """
+        """ Init class and validate cfg object """
         self.config = cfg
-        self.recipient = recipient
-        self.subject = subject
-        self.cc = cc
-        self.body = mybody
-        self.attachment = attachment
+        if not isinstance(self.config,dict):
+            raise InvalidConfigObject("cfg parameter is not a dict object")
 
         """ to avoid errors from the Account class, set the smtp_address to string """
-        self.smtp_address = self.config['smtp_address']
+        self.smtp_address = str(self.config['smtp_address'])
 
         """ setup exchange Credentials, Configuration and Account """
-        self.cred = Credentials(username=self.config['username'],\
-         password=self.config['password'])
-        self.config = Configuration(server = self.config['server'],\
+        self.cred = Credentials(username=str(self.config['username']),\
+         password=str(self.config['password']))
+
+        self.config = Configuration(server = str(self.config['server']),\
          credentials = self.cred, auth_type=NTLM)
+
         self.account = Account(primary_smtp_address=self.smtp_address,\
          config=self.config, access_type=DELEGATE)
 
-        """ validate email address before initializeing the Message class"""
-        if self.isEmailValid(self.recipient) != True:
-            raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format ".format(self.recipient))
-            #sys.exit()
+        """ set message object """
+        self.msg = Message(account=self.account)
 
 
-        """ initialize msg class with our credentials, Configuration and account """
-        #: NOTE: every email recipient gets
-        #:       suppplied to the msg object with a Mailbox class
-        self.msg = Message(
-                account=self.account,
-                subject=self.subject,
-                body=self.body,
-                to_recipients=[Mailbox(email_address=self.recipient)],
-                cc_recipients =[]
-            )
-
-    #check if the eamil is a valid email format
+    """ Validate email string; return True if valid, False for otherwise"""
     def isEmailValid(self,email_address):
-        """ Regex is cheap, easy to find, hard to read and verify.But-fuckit.
-            This regex is taken from:
-            https://github.com/scottbrady91/Python-Email-Verification-Script/blob/master/src/VerifyEmailAddress.py """
 
-
-        # NOTE: Check out the regex over at
-        #       https://github.com/syrusakbary/validate_email/blob/master/validate_email.py
+        if not isinstance(email_address, (basestring, str, unicode)):
+             return False
 
         email_address = email_address.lower().replace(" ","")
+
+        # NOTE: Regex is cheap, easy to find, hard to read and verify. But-fuckit.
+        #       Check out the regex over at
+        #       https://github.com/syrusakbary/validate_email/blob/master/validate_email.py
+        #
+        #       This regex is taken from:
+        #       https://github.com/scottbrady91/Python-Email-Verification-Script/blob/master/src/VerifyEmailAddress.py
+
         if not re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email_address):
             return False
         return True
@@ -89,27 +80,59 @@ class mailer(object):
         """ attach the file to the msg"""
         return self.msg.attach(self.attachment)
 
-    def sendmsg(self):
+    def sendmsg(self, recipient,  subject, cc=None, mybody=None, attachment=None):
+
+        """ #:   @method parameters:
+            #: @cfg: credentials for the exchange account, suplied as a dict
+            #: @recipient   : email address as string
+            #: @cc          : a list of email address strings
+            #: @mybody***   : the body of the email...
+            #: @attachment  : dict object containing the filename,
+            #:                full absolute path of the file to be attached.
+            #:                Defaults to None.
+        """
+
+        """ Validate parameters """
+        self.subject = str(subject)
+        self.body = mybody
+        self.attachment = attachment
+        self.recipient = recipient
+        self.cc = cc
+
+        """ validate email address before initializeing the Message class """
+        if self.isEmailValid(self.recipient) != True:
+            raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format ".format(self.recipient))
+
+        self.msg.to_recipients = [Mailbox(email_address=self.recipient)]
+        self.msg.subject = self.subject
+        if self.body is not None:
+            #TODO: Validate msg bady to be of only a couple of types
+            self.msg.body = self.body
+
         """Attach any included files and the cc list, and send that shit """
 
         """ check if there's an attachment, attach it if we have it """
         if self.attachment is not None:
+            if not isinstance(self.attachment, dict):
+                raise InvalidAttachment("The attachment needs to be a dictionary object")
             self.add_attachment()
 
-        """ loop through cc list and add them to the msg"""
-        for i in self.cc:
+        """ validate cc list"""
+        if self.cc is not None:
+            self.msg.cc_recipients = []
 
-            """ valifdate the email that we're sending to"""
-            if self.isEmailValid(i) is True:
-
-                if i not in self.msg.cc_recipients:
-
-                    self.msg.cc_recipients.append(Mailbox(email_address=i))
-                    print "message is being sent to: {0} as: {1} ".format(i,self.smtp_address)
-                    #: TODO: write to logger file who we sent emails to.
-            else:
-                raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(i))
-                #: TODO: write to logger file who we did not send emails to.
+            if not isinstance(self.cc,(list,tuple)):
+                raise InvalidRecipient("CC list must be a list or tupple")
+            for cc in self.cc:
+                if self.isEmailValid(cc) is True:
+                    """ if it's valid add it to the list """
+                    if cc not in self.msg.cc_recipients:
+                        self.msg.cc_recipients.append(Mailbox(email_address=cc))
+                        print "message is being sent to: {0} as: {1} ".format(cc,self.smtp_address)
+                        #: TODO: write to logger file who we sent emails to.
+                else:
+                    raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(cc))
+                    #: TODO: write to logger file who we did not send emails to.
 
         """ send the msg and save a copy in exchange """
         return self.msg.send_and_save()

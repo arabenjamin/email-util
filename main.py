@@ -26,7 +26,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum."""
     if len(sys.argv) == 2:
         recipient = str(sys.argv[1])
     try:
-        my_mail = mailer(cfg['exchange'],recipient,ccList,sub,mynotes)
-        my_mail.sendmsg()
+        my_mail = mailer(cfg['exchange'])
+        my_mail.sendmsg(recipient, sub, cc=ccList, mybody=mynotes)
     except InvalidEmailError:
         print "{0} is an invalid Email address".format(sys.argv[1])
