@@ -11,9 +11,9 @@ if __name__ == '__main__':
     json_data_file = open('config.json')
     cfg = json.load(json_data_file)
 
-    recipient = "asheperdigian@eltec.cc"
-    ccList = ["asheperdigian@eltec.cc"]
-    sub = "Ara's Test Email"
+    recipient = "test@example.com"
+    ccList = ["test2@example.com"]
+    sub = "Test Email"
 
     mynotes ="""Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
