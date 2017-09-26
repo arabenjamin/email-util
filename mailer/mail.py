@@ -93,7 +93,7 @@ class mailer(object):
         """
 
         """ Validate parameters """
-        self.subject = str(subject)
+        self.subject = subject
         self.body = mybody
         self.attachment = attachment
         self.recipient = recipient
