@@ -61,7 +61,8 @@ class mailer(object):
         #       This regex is taken from:
         #       https://github.com/scottbrady91/Python-Email-Verification-Script/blob/master/src/VerifyEmailAddress.py
 
-        if not re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email_address):
+        if not
+        re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,63})$', email_address):
             return False
         return True
 
@@ -82,8 +83,7 @@ class mailer(object):
 
     def sendmsg(self, recipient,  subject, cc=None, mybody=None, attachment=None):
 
-        """ #:   @method parameters:
-            #: @cfg: credentials for the exchange account, suplied as a dict
+        """ #: @method parameters:
             #: @recipient   : email address as string
             #: @cc          : a list of email address strings
             #: @mybody***   : the body of the email...
@@ -123,6 +123,7 @@ class mailer(object):
 
             if not isinstance(self.cc,(list,tuple)):
                 raise InvalidRecipient("CC list must be a list or tupple")
+
             for cc in self.cc:
                 if self.isEmailValid(cc) is True:
                     """ if it's valid add it to the list """
@@ -131,8 +132,9 @@ class mailer(object):
                         print "message is being sent to: {0} as: {1} ".format(cc,self.smtp_address)
                         #: TODO: write to logger file who we sent emails to.
                 else:
-                    raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(cc))
+                    #raise InvalidEmailError("Refusing to send email to address {0} : invalid email address format, ".format(cc))
                     #: TODO: write to logger file who we did not send emails to.
+                    print "Refusing to send email to address {0}: Invalid email address format".format(cc)
 
         """ send the msg and save a copy in exchange """
         return self.msg.send_and_save()
