@@ -67,18 +67,21 @@ class mailer(object):
 
     def add_attachment(self):
         """ Add attachment if there's one """
+
         #: FIXME: fix this shit to always work with any attachment. i.e. Excel/pdfs/word docs/images
+        for i in self.attachment:
 
-        """ self.attachment is a dict, the values, are paths that point to the file to be read"""
-        with open(self.attachment['full_path'], 'rb') as f:
-            my_attacment = f.read()
+            """ self.attachment is a dict, the values, are paths that point to the file to be read"""
+            with open(i['full_path'], 'rb') as f:
+                my_attacment = f.read()
 
-        """ create File attachment"""
-        self.attachment = FileAttachment(name=self.attachment['name'],\
-         content=my_attacment)
+            """ create File attachment"""
+            this_attachment = FileAttachment(name=i['name'],\
+            content=my_attacment)
 
-        """ attach the file to the msg"""
-        return self.msg.attach(self.attachment)
+            """ attach the file to the msg"""
+            self.msg.attach(this_attachment)
+        return
 
     def sendmsg(self, recipient,  subject, cc=None, mybody=None, attachment=None):
 
@@ -112,8 +115,8 @@ class mailer(object):
 
         """ check if there's an attachment, attach it if we have it """
         if self.attachment is not None:
-            if not isinstance(self.attachment, dict):
-                raise InvalidAttachment("The attachment needs to be a dictionary object")
+            if not isinstance(self.attachment, list):
+                raise InvalidAttachment("The attachment needs to be a list of dictionary objects")
             self.add_attachment()
 
         """ validate cc list"""
