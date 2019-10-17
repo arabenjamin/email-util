@@ -1,4 +1,4 @@
-exchangelib==1.9.3
+exchangelib==2.0.1
 ntlm-auth==1.0.2
 pytest==3.0.7
 twine==1.8.1
