@@ -2,7 +2,7 @@
 from setuptools import setup
 #from mailer import __version__
 
-__version__ ="0.1.5"
+__version__ ="0.1.6"
 
 with open('requirements.txt') as f:
     reqs = f.read().splitlines()
